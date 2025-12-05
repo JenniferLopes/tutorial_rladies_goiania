@@ -1,0 +1,969 @@
+---
+title: "Organização de Projetos em R | Tutorial no Youtube"
+subtitle: "Pacotes: {fs}, {usethis} e {here}"
+categories: [R, Projetos]
+image: imagens/jeni_rladies.png
+description: "Esse tutorial apresenta um **guia prático e completo** para trabalhar com três pacotes essenciais do ecossistema R que revolucionam a forma como organizamos e gerenciamos projetos. Pacotes: {fs}, {usethis} e {here}"
+format:
+  revealjs:
+    theme: serif
+    logo: "logo.png"
+    transition: slide
+    slide-number: true
+    chalkboard: true
+    preview-links: auto
+    css: styles.css
+    footer: "Jennifer Lopes • R-Ladies Goiânia"
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Bem-vindo(a)! {.center}
+
+### Sobre nós
+
+[![Capítulo Goiânia da organização mundial
+R-Ladies.](imagens/r_ladies_goiania.JPG){fig-align="center"
+width="619"}](https://www.rladiesgyn.com/)
+
+## Sobre nós
+
+![](imagens/fernanda.avif){width="187"}
+
+**Fernanda Kelly** - Fundadora
+
+![](imagens/Jennifer_Lopes.avif){width="187"}
+
+Jennifer Lopes - Co-Fundadora
+
+## **Organização de Projetos em R**
+
+-   📦 **Pacotes:** {usethis}, {fs}, {here}
+-   **Práticas:** 4 exercícios
+-   **Nível:** Iniciante \| Intermediário
+-   **Materiais:** estarão na descrição do vídeo
+
+# Objetivos deste tutorial
+
+![**Allison Horst.**](imagens/r2.gif){width="299"}
+
+## 1. **Promover reprodutibilidade e colaboração**
+
+-   Ensinar a comunidade R a criar projetos que funcionem em qualquer
+    computador, eliminando problemas com caminhos absolutos e
+    **`setwd()`**.
+
+-   Isso facilita o **compartilhamento de código** entre colegas,
+    orientadores e colaboradores, garantindo que análises possam ser
+    reproduzidas independentemente do sistema operacional ou estrutura
+    de pastas.
+
+## 2. **Estabelecer boas práticas desde o início**
+
+-   Capacitar iniciantes e intermediários a adotarem uma estrutura
+    profissional de organização de projetos desde seus primeiros
+    trabalhos em R.
+
+-   Ao aprender a separar dados brutos de processados, numerar scripts
+    sequencialmente e documentar adequadamente, os usuários desenvolvem
+    hábitos que sustentarão projetos mais complexos no futuro.
+
+## 3. **Economizar tempo**
+
+-   Resolver um dos problemas mais comuns que afasta pessoas do R: erros
+    com caminhos de arquivos.
+
+-   Ao aprender `{here}`, `{fs}` e `{usethis}`, a comunidade passa menos
+    tempo lutando com "file not found" e mais tempo fazendo análises,
+    tornando a experiência com R mais agradável e produtiva.
+
+# O que são projetos no R?
+
+## Extensão **R (.Rproj)**
+
+São uma forma de organizar todo o trabalho relacionado a uma análise,
+aplicação ou pesquisa em uma **pasta dedicada e autocontida**.
+
+``` r
+# primeiro_projeto/                # pasta raiz do projeto
+# ├── primeiro_projeto.Rproj       # arquivo de projeto RStudio
+# └── meu_projeto/                 # subpasta principal
+#     ├── dados/                   # dados brutos (não modificar manualmente)
+#     ├── scripts/                 # scripts R (.R, .Rmd, .qmd)
+#     ├── output/                  # resultados processados (csv, rds, etc.)
+#     ├── figuras/                 # gráficos e visualizações exportadas
+#     ├── docs/                    # relatórios ou apresentações
+#     ├── funcoes/                 # funções criadas
+#     └── README.md                # instruções rápidas sobre o projeto
+```
+
+## O que são projetos no R?
+
+[![Criação de projetos, algumas opções. Fonte: R for Data
+Science.](imagens/new-project.png){fig-align="center"
+width="475"}](https://r4ds.hadley.nz/workflow-scripts.html)
+
+## O problema {.smaller}
+
+``` r
+# ❌ Código que NÃO funciona em outro PC
+setwd("C:/Users/Jennifer/Documents/projeto")
+dados <- read.csv("../data/dados.csv")
+```
+
+**Problemas:**
+
+1.  Caminho absoluto não portável
+
+2.  `setwd()` muda diretório global
+
+3.  Não funciona em colaboração
+
+------------------------------------------------------------------------
+
+## A solução {.smaller}
+
+``` r
+# ✅ Código portável e reproduzível
+library(here)
+dados <- read.csv(here("data", "dados.csv"))
+```
+
+**Três Pilares:**
+
+| Pacote    | Função             | Quando |
+|-----------|--------------------|--------|
+| {usethis} | Criar projetos     | Início |
+| {here}    | Caminhos seguros   | Sempre |
+| {fs}      | Manipular arquivos | Diário |
+
+------------------------------------------------------------------------
+
+## Instalação {.smaller}
+
+### Pacotes necessários para prática
+
+``` r
+# Instalar (apenas uma vez)
+install.packages(c("usethis", "fs", "here"))
+
+# Carregar
+library(usethis)
+library(fs)
+library(here)
+```
+
+------------------------------------------------------------------------
+
+# Módulo 1: {usethis}
+
+[![](imagens/usethis.png){fig-align="center"
+width="235"}](https://usethis.r-lib.org/)
+
+## Sobre o pacote {usethis
+
+-   **`usethis`** é um pacote de fluxo de trabalho.
+
+-   Ele automatiza tarefas repetitivas que surgem durante a configuração
+    e o desenvolvimento de projetos, tanto para pacotes R quanto para
+    projetos que não são pacotes.
+
+> Nós iremos focar nas funções de criação de **projetos**!
+>
+> Mas lembre-se, o pacote vai muito além, leia a
+> [**documentação**](https://usethis.r-lib.org/index.html).
+
+## Criar projeto {.smaller}
+
+### Teoria
+
+``` r
+# Cria pasta + .Rproj + abre nova sessão
+usethis::create_project("meu_projeto")
+
+# Ver projeto atual
+usethis::proj_get()
+
+# Adicionar README
+usethis::use_readme_md()
+
+# Inicializar Git
+usethis::use_git()
+
+# Criar .gitignore
+usethis::use_git_ignore(c("*.log", "*.tmp"))
+```
+
+------------------------------------------------------------------------
+
+## 💻 PRÁTICA 1 {background-color="#e0f7fa"}
+
+### Começando
+
+------------------------------------------------------------------------
+
+## Prática 1: Tarefas {.smaller}
+
+**1. Criar projeto**
+
+``` r
+usethis::create_project("workshop_r")
+```
+
+**2. Verificar diretório**
+
+``` r
+getwd()
+usethis::proj_get()
+```
+
+**3. Configurar**
+
+``` r
+usethis::use_readme_md()
+usethis::use_git()
+usethis::use_git_ignore(c("*.log", ".Rhistory", ".RData"))
+```
+
+------------------------------------------------------------------------
+
+# Módulo 2: {here}
+
+[![](imagens/here.png){fig-align="center"
+width="235"}](https://here.r-lib.org/index.html)
+
+## **Sobre o pacote {here**
+
+-   O objetivo do pacote `here` é facilitar a referência a arquivos
+    em [fluxos de trabalho orientados a
+    projetos](https://rstats.wtf/projects.html) . Ao contrário do uso de
+    \`file\` [`setwd()`](https://rdrr.io/r/base/getwd.html), que é
+    frágil e dependente da forma como você organiza seus arquivos, o
+    pacote here utiliza o diretório raiz do projeto para construir
+    caminhos para os arquivos de forma simples.
+
+> O pacote `here` cria caminhos relativos ao diretório raiz.
+>
+> O pacote exibe o diretório raiz do projeto atual ao ser carregado ou
+> sempre que você chamar
+> \` [`here()`](https://here.r-lib.org/reference/here.html):\`.
+>
+> Mas lembre-se, o pacote vai muito além, leia a
+> [**documentação**](https://here.r-lib.org/index.html).
+
+## Problema dos caminhos {.smaller}
+
+``` r
+# ❌ Caminhos absolutos - não funcionam em outro PC
+"C:/Users/Jennifer/projeto/data/dados.csv"  # Windows
+"/Users/jennifer/projeto/data/dados.csv"     # Mac
+```
+
+**Solução: {here}**
+
+``` r
+library(here)
+
+# ✅ Encontra raiz automaticamente
+here()
+
+# ✅ Constrói caminhos relativos
+here("data", "dados.csv")
+here("scripts", "analise.R")
+here("data", "raw", "vendas.xlsx")
+```
+
+------------------------------------------------------------------------
+
+## Como {here} funciona {.smaller}
+
+Procura indicadores de raiz:
+
+1.  Arquivo `.Rproj` ⭐
+2.  Arquivo `.here`
+3.  Pasta `.git/`
+4.  Arquivo `DESCRIPTION`
+
+``` r
+# Ver raiz
+here()
+
+# Construir caminhos
+here("data")
+here("data", "raw", "arquivo.csv")
+
+# Verificar existência
+file.exists(here("README.md"))
+```
+
+> **VEJAMOS O NOSSO SCRIPT!**
+
+------------------------------------------------------------------------
+
+# Módulo 3: {fs}
+
+[![](imagens/fs.png){fig-align="center"
+width="190"}](https://fs.r-lib.org/)
+
+------------------------------------------------------------------------
+
+## **As funções `fs`** são divididas em quatro categorias principais: {.smaller}
+
+-   `path_`para manipular e construir caminhos
+
+-   `file_`para arquivos
+
+-   `dir_`para diretórios
+
+-   `link_`para links
+
+> **Operações para o sistema de arquivos.**
+
+------------------------------------------------------------------------
+
+## Funções Principais {.smaller}
+
+### Diretórios
+
+``` r
+# Criar
+dir_create(here("data"))
+dir_create(here("data", "raw"))
+
+# Listar
+dir_ls(here())
+dir_ls(here("data"), recurse = TRUE)
+dir_ls(here(), type = "directory")
+
+# Visualizar árvore
+dir_tree(here())
+
+# Copiar/mover
+dir_copy(origem, destino)
+
+# Deletar
+dir_delete(here("pasta"))
+```
+
+------------------------------------------------------------------------
+
+## Funções de arquivos {.smaller}
+
+``` r
+# Criar
+file_create(here("data", "notas.txt"))
+
+# Listar com padrão
+dir_ls(here("scripts"), glob = "*.R")
+
+# Informações
+file_info(here("README.md"))
+file_size(here("README.md"))
+file_exists(here("README.md"))
+
+# Copiar
+file_copy(origem, destino, overwrite = TRUE)
+
+# Mover/renomear
+file_move(origem, destino)
+
+# Deletar
+file_delete(arquivo)
+```
+
+------------------------------------------------------------------------
+
+## Manipulação de caminhos {.smaller}
+
+``` r
+# Extensões
+path_ext("relatorio.docx")               # "docx"
+path_ext_set("dados.xlsx", "csv")        # "dados.csv"
+path_ext_remove("analise.R")             # "analise"
+
+# Partes do caminho
+path_file(here("data", "vendas.csv"))    # "vendas.csv"
+path_dir(here("data", "raw", "x.csv"))   # ".../data/raw"
+
+# Conversões
+path_abs("data/dados.csv")
+path_rel(caminho, start = here())
+
+# Temporários
+file_temp(ext = ".csv")
+path_temp()
+```
+
+------------------------------------------------------------------------
+
+## 💻 PRÁTICA 2 {background-color="#e0f7fa"}
+
+### Explorar funções
+
+------------------------------------------------------------------------
+
+## Prática 2: Tarefas {.smaller}
+
+**CRIAR ARQUIVOS**
+
+``` r
+library(fs)
+library(here)
+
+# Scripts numerados
+scripts <- c(
+  "01-importar.R", "02-limpar.R",
+  "03-analisar.R", "04-visualizar.R")
+file_create(here("scripts", scripts))
+
+# Dados fictícios
+file_create(here("data", "raw", "vendas_2024.csv"))
+file_create(here("data", "raw", "clientes.xlsx"))
+file_create(here("data", "raw", "produtos.txt"))
+```
+
+------------------------------------------------------------------------
+
+## Prática 2: Tarefas (2/6) {.smaller}
+
+**LISTAR ARQUIVOS**
+
+``` r
+# Todos os arquivos
+dir_ls(here())
+
+# Apenas .R
+dir_ls(here("scripts"), glob = "*.R")
+
+# Recursivo
+dir_ls(here("data"), recurse = TRUE)
+
+# Apenas diretórios
+dir_ls(here(), type = "directory")
+```
+
+------------------------------------------------------------------------
+
+## Prática 2: Tarefas (3/6) {.smaller}
+
+**INFORMAÇÕES DOS ARQUIVOS**
+
+``` r
+# Detalhes
+file_info(here("scripts", "01-importar.R"))
+
+# Tamanho
+file_size(here("README.md"))
+
+# Existe?
+file_exists(here("data", "raw", "vendas_2024.csv"))
+
+# Visualizar árvore
+dir_tree(here())
+dir_tree(here("data"))
+```
+
+------------------------------------------------------------------------
+
+## Prática 2: Tarefas (4/6) {.smaller}
+
+**COPIAR ARQUIVOS**
+
+``` r
+# Copiar arquivo
+file_copy(
+  path = here("data", "raw", "vendas_2024.csv"),
+  new_path = here("data", "raw", "vendas_backup.csv"))
+
+# Copiar diretório
+dir_copy(
+  path = here("data", "raw"),
+  new_path = here("data", "raw_backup"))
+```
+
+------------------------------------------------------------------------
+
+## Prática 2: Tarefas (5/6) {.smaller}
+
+**MOVER/RENOMEAR E EXTENSÕES**
+
+``` r
+# Simular processamento: raw → clean
+file_copy(
+  path = here("data", "raw", "vendas_2024.csv"),
+  new_path = here("data", "clean", "vendas_processadas.csv"))
+
+# Renomear script
+file_move(
+  path = here("scripts", "01-importar.R"),
+  new_path = here("scripts", "01-importar-dados-vendas.R"))
+
+# Ver extensões
+arquivos <- dir_ls(here("data", "raw"))
+path_ext(arquivos)
+
+# Mudar extensão
+path_ext_set("dados.xlsx", "csv")
+
+# Apenas nome do arquivo
+path_file(here("data", "raw", "vendas_2024.csv"))
+```
+
+------------------------------------------------------------------------
+
+## Prática 2: Tarefas (6/6) {.smaller}
+
+**TEMPORÁRIOS E LIMPEZA**
+
+``` r
+# Arquivo temporário
+temp_file <- file_temp(ext = ".rds")
+print(temp_file)
+
+# Testar salvamento
+saveRDS(mtcars, temp_file)
+file_exists(temp_file)
+
+# Diretório temporário
+path_temp()
+
+# Deletar backup
+file_delete(here("data", "raw", "vendas_backup.csv"))
+dir_delete(here("data", "raw_backup"))
+
+# Verificação final
+dir_tree(here())
+```
+
+------------------------------------------------------------------------
+
+## 💻 PRÁTICA 3 {background-color="#e0f7fa"}
+
+### Workflow completo
+
+------------------------------------------------------------------------
+
+## Prática 3: Workflow (1/3) {.smaller}
+
+**SETUP E GERAR DADOS**
+
+``` r
+library(here)
+library(fs)
+
+# Criar script
+file_create(here("scripts", "01-gerar-dados.R"))
+
+# Dados fictícios
+set.seed(123)
+vendas <- data.frame(
+  data = seq.Date(as.Date("2024-01-01"), 
+                  as.Date("2024-03-31"), by = "day"),
+  produto = sample(LETTERS[1:4], 90, replace = TRUE),
+  valor = round(runif(90, 100, 1000), 2),
+  quantidade = sample(1:10, 90, replace = TRUE))
+
+# Salvar em raw
+write.csv(vendas, 
+          here("data", "raw", "vendas_q1.csv"), 
+          row.names = FALSE)
+
+# Verificar
+file_exists(here("data", "raw", "vendas_q1.csv"))
+file_size(here("data", "raw", "vendas_q1.csv"))
+```
+
+------------------------------------------------------------------------
+
+## Prática 3: Workflow (2/3) {.smaller}
+
+**PROCESSAR E ANALISAR**
+
+``` r
+# Ler dados brutos
+dados_raw <- read.csv(here("data", "raw", "vendas_q1.csv"))
+
+# Processar
+dados_clean <- dados_raw
+dados_clean$receita <- dados_clean$valor * dados_clean$quantidade
+dados_clean$data <- as.Date(dados_clean$data)
+
+# Salvar em clean
+write.csv(dados_clean,
+          here("data", "clean", "vendas_processadas.csv"),
+          row.names = FALSE)
+
+# Verificar diferença de tamanho
+file_size(here("data", "raw", "vendas_q1.csv"))
+file_size(here("data", "clean", "vendas_processadas.csv"))
+
+# Análise - agregar dados
+resumo <- aggregate(receita ~ produto, dados_clean, sum)
+
+# Salvar resultado
+write.csv(resumo,
+          here("outputs", "resumo_vendas.csv"),
+          row.names = FALSE)
+```
+
+------------------------------------------------------------------------
+
+## Prática 3: Workflow (3/3) {.smaller}
+
+**BACKUP E ORGANIZAÇÃO**
+
+``` r
+# Criar pasta backup com timestamp
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+backup_dir <- here("data", paste0("backup_", timestamp))
+dir_create(backup_dir)
+
+# Copiar dados processados
+file_copy(
+  here("data", "clean", "vendas_processadas.csv"),
+  path(backup_dir, "vendas_processadas.csv"))
+
+# Listar estrutura criada
+dir_tree(here("data"))
+dir_tree(here("outputs"))
+
+# Informações dos arquivos
+info <- file_info(dir_ls(here("data", "clean")))
+print(info[, c("path", "size", "modification_time")])
+
+# Limpeza - deletar temporários
+temp_files <- dir_ls(here(), glob = "*.tmp")
+if (length(temp_files) > 0) file_delete(temp_files)
+```
+
+------------------------------------------------------------------------
+
+## 💻 PRÁTICA 4 {background-color="#e0f7fa"}
+
+### Indo além: mais funções
+
+------------------------------------------------------------------------
+
+## Prática 4: Explorar (1/3) {.smaller}
+
+**LINKS SIMBÓLICOS E PERMISSÕES**
+
+``` r
+# Criar link para dados grandes
+link_create(
+  path = here("data", "clean", "vendas_processadas.csv"),
+  new_path = here("outputs", "dados_link"))
+
+# Ver para onde aponta
+link_path(here("outputs", "dados_link"))
+
+# Ver permissões
+file_info(here("README.md"))$permissions
+```
+
+------------------------------------------------------------------------
+
+## Prática 4: Explorar (2/3) {.smaller}
+
+**BUSCA E COMPARAÇÃO**
+
+``` r
+# Buscar padrão específico
+dir_ls(here(), recurse = TRUE, regexp = "vendas")
+
+# Buscar por tipo
+dir_ls(here(), recurse = TRUE, type = "file")
+
+# Comparar tamanhos
+files <- dir_ls(here("data"), recurse = TRUE, type = "file")
+sizes <- file_size(files)
+names(sizes) <- basename(files)
+sort(sizes, decreasing = TRUE)
+
+# Metadados - última modificação
+info <- file_info(here("scripts", "01-gerar-dados.R"))
+info$modification_time
+info$access_time
+```
+
+------------------------------------------------------------------------
+
+## Prática 4: Explorar (3/3) {.smaller}
+
+**CONVERSÃO E UTILITÁRIOS**
+
+``` r
+# Absoluto para relativo
+caminho_abs <- path_abs(here("data", "raw"))
+path_rel(caminho_abs, start = here())
+
+# Normalizar caminho
+path_norm("./data/../data/./raw")
+
+# Expandir ~
+path_expand("~/Documents")
+
+# Home directory
+path_home()
+
+# Juntar caminhos
+path(here("data"), "raw", "arquivo.csv")
+```
+
+------------------------------------------------------------------------
+
+## Integrando {.smaller}
+
+``` r
+library(here)
+library(fs)
+
+# Workflow completo
+caminho_raw <- here("data", "raw", "vendas.csv")
+
+# 1. Verificar se existe
+if (file_exists(caminho_raw)) {
+  
+  # 2. Ver informações
+  cat("Tamanho:", as.character(file_size(caminho_raw)), "\n")
+  
+  # 3. Ler
+  dados <- read.csv(caminho_raw)
+  
+  # 4. Processar
+  dados$total <- dados$valor * dados$quantidade
+  
+  # 5. Salvar em clean
+  caminho_clean <- here("data", "clean", "vendas_limpo.csv")
+  write.csv(dados, caminho_clean, row.names = FALSE)
+  
+  # 6. Backup
+  timestamp <- format(Sys.time(), "%Y%m%d")
+  caminho_backup <- here("data", "clean", 
+                         paste0("vendas_", timestamp, ".csv"))
+  file_copy(caminho_clean, caminho_backup)
+  
+  # 7. Confirmar
+  cat("✅ Arquivo salvo:", caminho_clean, "\n")
+  cat("✅ Backup criado:", caminho_backup, "\n")
+}
+```
+
+## README - PARTE 1
+
+### Sobre o Projeto
+
+Este projeto foi criado durante o workshop "Organização de Projetos em
+R" do R-Ladies Goiânia. O objetivo é aplicar boas práticas de
+organização usando os pacotes {usethis}, {fs} e {here} para criar um
+fluxo de trabalho reproduzível e colaborativo.
+
+## README - PARTE 2
+
+### Estrutura do Projeto
+
+``` r
+workshop_r/
+├── data/
+│   ├── raw/              # Dados originais (NUNCA modificar!)
+│   └── clean/            # Dados processados
+├── scripts/              # Scripts R numerados
+│   ├── 01-importar.R
+│   ├── 02-limpar.R
+│   ├── 03-analisar.R
+│   └── 04-visualizar.R
+├── outputs/              # Resultados das análises
+├── figures/              # Gráficos e visualizações
+├── README.md             # Este arquivo
+└── workshop_r.Rproj      # Arquivo de projeto RStudio
+```
+
+## README - PARTE 3
+
+``` r
+install.packages(c("usethis", "fs", "here"))
+```
+
+### Como usar
+
+1.  Abra o projeto: Clique duas vezes no arquivo workshop_r.Rproj
+2.  Instale os pacotes necessários:
+
+## README - PARTE 4
+
+### Pacotes utilizados
+
+1.  {here} - Gerenciamento de caminhos relativos
+2.  {fs} - Manipulação de arquivos e diretórios
+3.  {usethis} - Automação de configuração de projetos
+
+## README - PARTE 5
+
+### Autora
+
+Jennifer Lopes - R-Ladies Goiânia
+
+Site: [rladiesgyn.com](https://www.rladiesgyn.com/)
+
+# Boas práticas
+
+------------------------------------------------------------------------
+
+## Faça ✅ {.smaller}
+
+1.  Use projetos R (.Rproj)
+
+2.  Sempre use `here()` para caminhos
+
+3.  Nunca modifique `data/raw/`
+
+4.  Use nomes descritivos: `01-importar.R`
+
+5.  Documente no README.md
+
+# Boas práticas
+
+## Evite ❌ {.smaller}
+
+1.  `setwd()` - Nunca use!
+
+2.  Caminhos absolutos
+
+3.  Espaços em nomes de arquivos
+
+4.  Acentos em nomes
+
+5.  Scripts sem numeração
+
+------------------------------------------------------------------------
+
+## Nomenclatura {.smaller}
+
+**Não use ❌**
+
+```         
+analise final.R
+dados (1).csv
+Script Análise.R
+```
+
+**Use✅**
+
+```         
+03-analise-final.R
+dados_vendas_2024.csv
+01-importar-dados.R
+```
+
+------------------------------------------------------------------------
+
+## Estrutura Recomendada {.smaller}
+
+```         
+projeto/
+├── data/
+│   ├── raw/          # Dados originais (NUNCA modificar!)
+│   └── clean/        # Dados processados
+├── scripts/          # Scripts numerados
+├── outputs/          # Resultados
+├── figures/          # Gráficos
+├── README.md
+└── projeto.Rproj
+```
+
+------------------------------------------------------------------------
+
+## Template de script {.smaller}
+
+``` r
+# Título: Análise de Vendas
+# Autor: Seu Nome
+# Data: 2025-01-15
+
+# 1. Setup ----
+library(here)
+library(fs)
+library(dplyr)
+
+# 2. Importar ----
+dados <- read.csv(here("data", "raw", "vendas.csv"))
+
+# 3. Processar ----
+dados_clean <- dados %>%
+  filter(!is.na(valor))
+
+# 4. Exportar ----
+write.csv(dados_clean, 
+          here("data", "clean", "vendas_limpo.csv"))
+```
+
+------------------------------------------------------------------------
+
+## Cheatsheet {.smaller}
+
+``` r
+# CRIAR PROJETO
+usethis::create_project("nome")
+usethis::use_readme_md()
+usethis::use_git()
+
+# ESTRUTURA
+dir_create(here("data", c("raw", "clean")))
+dir_tree(here())
+
+# CAMINHOS
+here("data", "arquivo.csv")
+
+# ARQUIVOS
+file_create(caminho)
+file_copy(origem, destino, overwrite = TRUE)
+file_move(origem, destino)
+file_delete(arquivo)
+dir_ls(here(), glob = "*.R")
+file_info(arquivo)
+
+# EXTENSÕES
+path_ext(arquivo)
+path_ext_set(arquivo, "nova_ext")
+path_file(caminho)
+```
+
+------------------------------------------------------------------------
+
+## Recursos {.smaller}
+
+**Documentação:** - [{usethis}](https://usethis.r-lib.org/) -
+[{fs}](https://fs.r-lib.org/) - [{here}](https://here.r-lib.org/)
+
+**Livros:** - [R for Data Science](https://r4ds.hadley.nz/) \| [What
+They Forgot to Teach You](https://rstats.wtf/)
+
+**Adicionais:** - [{renv}](https://rstudio.github.io/renv/) -
+Dependências \| [{targets}](https://docs.ropensci.org/targets/) -
+Pipelines
+
+------------------------------------------------------------------------
+
+## Próximos passos 🚀 {.smaller}
+
+1.  Crie projetos para trabalhos reais
+2.  Migre código antigo para nova estrutura
+3.  Integre com GitHub
+4.  Explore {renv} para dependências
+5.  Aprenda {targets} para pipelines
+6.  Compartilhe boas práticas
+
+------------------------------------------------------------------------
+
+## Obrigada! 🎉 {.center}
+
+**R-Ladies Goiânia**
+
+Organizando projetos, uma pasta por vez! 📁
+
+#### Dúvidas envie para nós! 💬
+
+Nosso site, tem todas as redes!
+
+[![](https://img.shields.io/badge/R--Ladies-Goi%C3%A2nia-purple)](https://www.rladiesgyn.com/)

@@ -1,0 +1,577 @@
+---
+title: "Criando projetos, manipulando arquivos e organizando estruturas no R"
+subtitle: "Pacotes: {fs}, {usethis} e {here}"
+author: "R-Ladies Goiânia - Jennifer Lopes"
+date: today
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    toc-title: "Sumário"
+    number-sections: false
+    code-fold: false
+    code-tools: true
+    code-copy: true
+    smooth-scroll: true
+    theme: 
+      light: flatly
+      dark: darkly
+    css: styles.css
+    mainfont: "Segoe UI"
+    fontsize: 1.1em
+    linestretch: 1.6
+    link-external-newwindow: true
+    include-after-body: footer.html
+    title-block-banner: true
+    title-block-banner-color: "#b048a2"
+---
+
+::: {style="text-align: center; margin: 30px 0;"}
+![](logo.png){width="350px"}
+:::
+
+### Introdução
+
+Este documento apresenta um **guia prático e completo** para trabalhar com três pacotes essenciais do ecossistema R que revolucionam a forma como organizamos e gerenciamos projetos:
+
+1.  **{usethis}** - Criar projetos reprodutíveis e configurar infraestrutura
+2.  **{fs}** - Manipular arquivos e pastas de forma segura e multiplataforma
+3.  **{here}** - Garantir caminhos consistentes e relativos ao projeto
+
+#### Por que usar esses pacotes?
+
+**Problema comum:** Caminhos absolutos como `C:/Users/MeuNome/Documents/projeto/data.csv` não funcionam em outros computadores.
+
+**Solução:** Usar caminhos relativos com `{here}` garante que seu código funcione em qualquer máquina!
+
+#### Fluxo de trabalho recomendado
+
+1.  **Criar** um projeto com `{usethis}`
+2.  **Colocar** este arquivo `.qmd` dentro do projeto
+3.  **Executar** os chunks sequencialmente para aprender na prática
+
+### Configuração Inicial
+
+```{r setup, message=FALSE, warning=FALSE}
+# Instalar pacotes (se necessário)
+# install.packages(c("usethis", "fs", "here"))
+
+# Carregar pacotes
+library(usethis)
+library(fs)
+library(here)
+```
+
+### Criando um Projeto com {usethis}
+
+#### O que é um projeto no R?
+
+Um **projeto** (`.Rproj`) é um diretório que:
+
+-   Define o **diretório de trabalho** automaticamente
+-   Mantém **histórico de comandos** e **ambiente** isolados
+-   Facilita **controle de versão** (Git/GitHub)
+-   Garante **reprodutibilidade**
+
+#### Criando seu primeiro projeto
+
+```{r criar-projeto, eval=FALSE}
+# ATENÇÃO: Execute isto APENAS UMA VEZ, fora deste documento!
+# Isso criará uma nova pasta e abrirá uma nova sessão do RStudio
+
+# usethis::create_project("meu_projeto_fs")
+```
+
+#### O que acontece ao criar um projeto?
+
+1.  Cria uma pasta com o nome especificado
+
+2.  Gera um arquivo `.Rproj`
+
+3.  Cria `.gitignore` (para controle de versão)
+
+4.  Abre uma **nova sessão** do RStudio no projeto
+
+#### Outras funções úteis do {usethis}
+
+```{r usethis-extras, eval=FALSE}
+# Inicializar Git no projeto
+use_git()
+
+# Criar repositório no GitHub
+use_github()
+
+# Adicionar arquivo README
+use_readme_md()
+
+# Criar arquivo de licença
+use_mit_license("Jennifer Lopes")
+
+# Adicionar pacote ao DESCRIPTION
+use_package("fs", "usethis", "here")
+
+# Criar arquivo .gitignore personalizado
+use_git_ignore(c("*.log", "*.tmp", "dados_sensiveis/"))
+```
+
+#### Dica Importante
+
+> Sempre trabalhe dentro de **projetos R** (.Rproj). Isso elimina a necessidade de usar `setwd()` e garante que seus caminhos sejam relativos!
+
+### Navegação com {here}
+
+#### Por que usar {here}?
+
+O pacote `{here}` resolve o problema de **caminhos relativos** de forma inteligente:
+
+-   **Multiplataforma** (funciona em Windows, Mac, Linux)
+
+-   **Portável** (código funciona em qualquer computador)
+
+-   **Inteligente** (detecta automaticamente a raiz do projeto)
+
+#### Encontrando a raiz do projeto
+
+```{r here-basico}
+# Mostra o diretório raiz do projeto
+here()
+```
+
+O `{here}` procura por:
+
+1.  Arquivo `.Rproj`
+2.  Arquivo `.here`
+3.  Pasta `.git`
+4.  Arquivo `DESCRIPTION`
+
+#### Construindo caminhos relativos
+
+```{r here-caminhos}
+# Caminho para pasta 'data'
+here("data")
+
+# Caminho para arquivo específico
+here("data", "raw", "dados.csv")
+
+# Caminho para script
+here("scripts", "analise.R")
+```
+
+#### Evite isso:
+
+```{r evitar, eval=FALSE}
+# NÃO FAÇA:
+setwd("C:/Users/MeuNome/Documents/projeto")  # Não funciona em outros PCs
+read.csv("../data/arquivo.csv")  # Caminho frágil
+
+# FAÇA:
+library(here)
+read.csv(here("data", "arquivo.csv"))  # Sempre funciona!
+```
+
+### Manipulação de Arquivos com {fs}
+
+#### Por que usar {fs} em vez de funções base?
+
+| Característica    | {fs}                     | Funções base      |
+|-------------------|--------------------------|-------------------|
+| Sintaxe           | Consistente e clara      | Variada e confusa |
+| Multiplataforma   | \- Sim                   | \- Limitado       |
+| Mensagens de erro | Claras e informativas    | Obscuras          |
+| Retorno           | Tibbles estruturados     | Vetores simples   |
+| Segurança         | Verificações automáticas | Manual            |
+
+#### Criando a estrutura do projeto
+
+```{r criar-estrutura}
+# Criar diretórios principais
+dir_create(here("data"))
+dir_create(here("data", "raw"))      # Dados brutos (nunca modificar!
+dir_create(here("data", "clean"))    # Dados limpos/processados
+dir_create(here("scripts"))          # Scripts R
+dir_create(here("outputs"))          # Resultados/tabelas
+dir_create(here("figures"))          # Gráficos
+dir_create(here("reports"))          # Relatórios
+
+# Visualizar estrutura criada
+dir_tree(here())
+```
+
+#### Estrutura recomendada
+
+```         
+meu_projeto/
+├── data/
+│   ├── raw/          # Dados originais (somente leitura)
+│   └── clean/        # Dados processados
+├── scripts/          # Código R (.R)
+├── reports/          # Relatórios (.Rmd, .qmd)
+├── outputs/          # Tabelas, resultados
+├── figures/          # Gráficos (PNG, PDF)
+└── README.md         # Documentação do projeto
+```
+
+### Operações com Arquivos
+
+#### Criar arquivos
+
+```{r criar-arquivos}
+# Criar arquivo vazio
+file_create(here("data", "arquivo.txt"))
+
+# Criar múltiplos arquivos
+file_create(here("scripts", c("01-import.R", "02-clean.R", "03-analyze.R")))
+```
+
+**Quando usar:** Para inicializar arquivos que serão preenchidos depois.
+
+#### Copiar arquivos e diretórios
+
+```{r copiar}
+# Copiar arquivo
+file_copy(
+  path = here("data", "arquivo.txt"),
+  new_path = here("data", "arquivo_backup.txt"),
+  overwrite = TRUE  # Sobrescrever se já existir
+)
+
+# Copiar diretório inteiro
+dir_copy(
+  path = here("data", "raw"),
+  new_path = here("data", "raw_backup")
+)
+```
+
+**Quando usar:** Para criar backups ou duplicar estruturas.
+
+#### Mover e renomear
+
+```{r mover}
+# Mover arquivo (= renomear)
+file_move(
+  path = here("data", "arquivo_backup.txt"),
+  new_path = here("data", "arquivo_renomeado.txt")
+)
+
+# Mover para outra pasta
+file_move(
+  path = here("data", "arquivo_renomeado.txt"),
+  new_path = here("outputs", "arquivo_renomeado.txt")
+)
+```
+
+**Nota:** `file_move()` serve tanto para mover quanto para renomear!
+
+#### Listar arquivos e diretórios
+
+```{r listar}
+# Listar tudo na pasta 'data'
+dir_ls(here("data"))
+
+# Listar apenas arquivos .R
+dir_ls(here("scripts"), glob = "*.R")
+
+# Listar recursivamente (incluir subpastas)
+dir_ls(here("data"), recurse = TRUE)
+
+# Listar apenas diretórios
+dir_ls(here(), type = "directory")
+```
+
+**Quando usar:** Para verificar conteúdo, auditar arquivos ou criar pipelines.
+
+#### Obter informações detalhadas
+
+```{r info-arquivos}
+# Informações de um arquivo
+file_info(here("data", "arquivo.txt"))
+
+# Informações úteis específicas
+file_size(here("data", "arquivo.txt"))      # Tamanho
+file_exists(here("data", "arquivo.txt"))    # Existe?
+```
+
+**Retorna:** Tibble com tamanho, permissões, datas de modificação, etc.
+
+#### Deletar arquivos e diretórios
+
+```{r deletar}
+# Deletar arquivo
+file_delete(here("outputs", "arquivo_renomeado.txt"))
+
+# Deletar diretório vazio
+dir_delete(here("data", "raw_backup"))
+
+# CUIDADO: Deletar diretório com conteúdo
+# dir_delete(here("data"), recurse = TRUE)  # Use com cautela!
+```
+
+**ATENÇÃO:** `file_delete()` e `dir_delete()` são **permanentes** (não vão para lixeira)!
+
+### Manipulação de Caminhos
+
+#### Construir caminhos de forma segura
+
+```{r caminhos}
+# Construir caminho (alternativa ao here)
+path("pasta", "subpasta", "arquivo.csv")
+
+# Combina caminhos corretamente em qualquer SO
+path("data", "raw", "dados.xlsx")
+```
+
+**Por que usar:** Funciona em Windows (`\`), Mac/Linux (`/`) automaticamente.
+
+#### Trabalhar com extensões
+
+```{r extensoes}
+# Extrair extensão
+path_ext("relatorio.docx")
+
+# Mudar extensão
+path_ext_set("relatorio.docx", "pdf")
+
+# Remover extensão
+path_ext_remove("analise.R")
+```
+
+**Útil para:** Converter formatos, validar tipos de arquivo.
+
+#### Caminhos absolutos vs relativos
+
+```{r abs-rel}
+# Transformar em caminho absoluto
+path_abs("data/arquivo.txt")
+
+# Obter caminho relativo
+path_rel(here("data", "arquivo.txt"), start = here())
+
+# Nome do arquivo (sem caminho)
+path_file(here("data", "arquivo.txt"))
+
+# Diretório pai
+path_dir(here("data", "arquivo.txt"))
+```
+
+### Links simbólicos
+
+#### O que são links simbólicos?
+
+**Links simbólicos** são "atalhos" que apontam para outro arquivo/pasta sem duplicar dados.
+
+#### Criar e gerenciar links
+
+```{r links, eval=FALSE}
+# Criar link simbólico
+link_create(
+  path = here("data", "arquivo.txt"),
+  new_path = here("data", "atalho_link"))
+
+# Verificar para onde o link aponta
+link_path(here("data", "atalho_link"))
+
+# Deletar link (não deleta arquivo original)
+link_delete(here("data", "atalho_link"))
+```
+
+**Quando usar:** Para acessar arquivos em múltiplos locais sem duplicar espaço.
+
+### Arquivos Temporários
+
+#### Por que usar arquivos temporários?
+
+Arquivos temporários são úteis para:
+
+-   Armazenar dados intermediários
+-   Testes
+-   Limpeza automática após sessão
+
+#### Criar arquivos temporários
+
+```{r temp}
+# Criar arquivo temporário
+arquivo_temp <- file_temp(ext = ".csv")
+arquivo_temp
+
+# Caminho do diretório temporário
+path_temp()
+
+# Criar arquivo temporário com nome específico
+file_temp("meus_dados", ext = ".rds")
+```
+
+**Vantagem:** Sistema operacional limpa automaticamente arquivos temporários.
+
+### Exemplo
+
+#### Cenário: Projeto de análise de dados
+
+Vamos criar um projeto completo do zero:
+
+```{r exemplo-completo}
+# 1. Criar estrutura de pastas
+dir_create(here("data", "raw"))
+dir_create(here("data", "clean"))
+dir_create(here("scripts"))
+dir_create(here("outputs"))
+dir_create(here("figures"))
+dir_create(here("reports"))
+
+# 2. Criar scripts de análise
+scripts <- c(
+  "01-import-data.R",
+  "02-clean-data.R",
+  "03-exploratory-analysis.R",
+  "04-modeling.R",
+  "05-visualization.R"
+)
+file_create(here("scripts", scripts))
+
+# 3. Criar arquivo README
+file_create(here("README.md"))
+
+# 4. Visualizar estrutura final
+dir_tree(here(), recurse = 1)
+```
+
+### Boas Práticas e Dicas
+
+#### Faça
+
+1.  **Use projetos R** para todos os trabalhos
+2.  **Sempre use `here()`** para caminhos
+3.  **Documente** a estrutura no README
+4.  **Nunca modifique** dados em `data/raw`
+5.  **Use nomes descritivos** para arquivos e pastas
+6.  **Versione** seu projeto com Git
+
+#### Evite
+
+1.  `setwd()` - Nunca use!
+
+2.  Caminhos absolutos - Não são portáveis
+
+3.  Espaços em nomes - Use `_` ou `-`
+
+4.  Caracteres especiais - Evite acentos
+
+5.  Modificar dados originais - Mantenha em `raw/`
+
+### Crie um **template de projeto** pessoal:
+
+```{r template, eval=FALSE}
+# Salve este script como "setup_projeto.R"
+criar_projeto_padrao <- function(nome) {
+  usethis::create_project(nome)
+  
+  # Estrutura de pastas
+  fs::dir_create(here::here("data", c("raw", "clean")))
+  fs::dir_create(here::here(c("scripts", "outputs", "figures", "reports")))
+  
+  # Scripts básicos
+  fs::file_create(here::here("scripts", c(
+    "01-import.R",
+    "02-clean.R", 
+    "03-analyze.R"
+  )))
+  
+  # README
+  usethis::use_readme_md()
+  
+  # Git
+  usethis::use_git()
+  
+  message("- Projeto criado com sucesso!")
+}
+
+# Usar:
+# criar_projeto_padrao("meu_novo_projeto")
+```
+
+### Considerações
+
+Você agora domina os **três pilares** da organização de projetos em R:
+
+| Pacote        | Função Principal            | Quando Usar               |
+|---------------|-----------------------------|---------------------------|
+| **{usethis}** | Criar e configurar projetos | Início do projeto         |
+| **{fs}**      | Manipular arquivos/pastas   | Gerenciamento de arquivos |
+| **{here}**    | Caminhos relativos seguros  | Sempre!                   |
+
+#### Próximos passos
+
+1.  Pratique criando projetos reais
+
+2.  Integre com controle de versão (Git/GitHub)
+
+3.  Explore outros pacotes: `{renv}` (gerenciar dependências), `{targets}` (pipelines)
+
+4.  Documente sempre com README.md
+
+### Referências e Links Úteis
+
+#### Documentação dos Pacotes
+
+-   **{usethis}**
+    -   [Site oficial](https://usethis.r-lib.org/)\
+    -   [Documentação completa](https://usethis.r-lib.org/reference/index.html)\
+    -   [GitHub](https://github.com/r-lib/usethis)
+-   **{fs}**
+    -   [Site oficial](https://fs.r-lib.org/)\
+    -   [Documentação completa](https://fs.r-lib.org/reference/index.html)\
+    -   [GitHub](https://github.com/r-lib/fs)
+-   **{here}**
+    -   [Site oficial](https://here.r-lib.org/)\
+    -   [Documentação completa](https://here.r-lib.org/reference/index.html)\
+    -   [GitHub](https://github.com/r-lib/here)
+
+#### Artigo
+
+-   [R for Data Science - Workflow: projects](https://r4ds.hadley.nz/workflow-scripts.html#projects)\
+    *Capítulo sobre organização de projetos*
+
+-   [RStudio Projects Tutorial](https://support.posit.co/hc/en-us/articles/200526207-Using-RStudio-Projects)\
+    *Tutorial oficial da Posit*
+
+#### Ferramentas complementares
+
+-   **{renv}** - Gerenciamento de dependências\
+    <https://rstudio.github.io/renv/>
+
+-   **{targets}** - Pipelines de análise\
+    <https://docs.ropensci.org/targets/>
+
+#### Autor e contribuições
+
+*Este documento foi criado como material educacional. Sinta-se livre para compartilhar e adaptar conforme necessário!*
+
+### Apêndice: Cheatsheet
+
+```{r cheatsheet, eval=FALSE}
+# CRIAR PROJETO
+usethis::create_project("nome_projeto")
+
+# ESTRUTURA
+library(here); library(fs)
+dir_create(here("data", "raw"))
+dir_create(here("scripts"))
+
+# CAMINHOS
+here("data", "arquivo.csv")  # Sempre use!
+
+# ARQUIVOS
+file_create(here("scripts", "analise.R"))
+file_copy(origem, destino)
+file_move(origem, destino)
+file_delete(arquivo)
+
+# PASTAS
+dir_create(here("nova_pasta"))
+dir_ls(here("data"))
+dir_tree(here())
+
+# GIT
+usethis::use_git()
+usethis::use_github()
+```
