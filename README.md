@@ -54,7 +54,7 @@ install.packages(c("usethis", "fs", "here", "quarto"))
 
 1. **Clone ou baixe este repositório**
    ```bash
-   git clone [https://github.com/JenniferLopes/tutorial_rladies_goiania.git]
+   git clone https://github.com/JenniferLopes/tutorial_rladies_goiania.git
    ```
 
 2. **Abra o projeto no RStudio**
